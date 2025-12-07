@@ -1,0 +1,65 @@
+<div class="heatmap-container">
+  <div #heatmapContainer class="chart-container"></div>
+
+  @if (showDetails()) {
+    <div
+      class="details-panel"
+      (click)="$event.stopPropagation()"
+      (keydown)="$event.stopPropagation()"
+      role="dialog"
+      tabindex="0"
+    >
+      <div class="details-header">
+        <h3>Anomaly Details</h3>
+        <button class="close-btn" (click)="closeDetails()" type="button">✕</button>
+      </div>
+
+      @if (selectedCell(); as cell) {
+        <div class="details-content">
+          <div class="details-summary">
+            <div class="summary-item">
+              <span class="label">Hour:</span>
+              <span class="value">{{ cell.hour }}:00</span>
+            </div>
+            <div class="summary-item">
+              <span class="label">Severity:</span>
+              <span class="value severity">
+                {{ cell.severity.toUpperCase() }}
+              </span>
+            </div>
+            <div class="summary-item">
+              <span class="label">Total Count:</span>
+              <span class="value">{{ cell.count }}</span>
+            </div>
+          </div>
+
+          <div class="anomalies-list">
+            <h4>Anomalies ({{ cell.count }})</h4>
+            @for (anomaly of cell.anomalies; track anomaly.id) {
+              <div class="anomaly-item">
+                <div class="anomaly-header">
+                  <span class="anomaly-type">{{ anomaly.type }}</span>
+                  <span class="anomaly-id">{{ anomaly.id }}</span>
+                </div>
+                <p class="anomaly-description">{{ anomaly.description }}</p>
+                <span class="anomaly-time">
+                  {{ formatDate(anomaly.timestamp) }}
+                </span>
+              </div>
+            } @empty {
+              <p class="no-data">No anomalies found</p>
+            }
+          </div>
+        </div>
+      }
+    </div>
+
+    <div
+      class="details-overlay"
+      (click)="closeDetails()"
+      (keydown.escape)="closeDetails()"
+      role="button"
+      tabindex="0"
+    ></div>
+  }
+</div>

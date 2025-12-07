@@ -68,6 +68,7 @@ export class EventTimelineComponent implements OnInit, OnDestroy, AfterViewInit 
 
   ngOnDestroy(): void {
     this.eventsService.disconnectFromEventStream();
+    window.removeEventListener('resize', this.handleResize.bind(this));
     if (this.chart) {
       this.chart.dispose();
     }
@@ -76,7 +77,11 @@ export class EventTimelineComponent implements OnInit, OnDestroy, AfterViewInit 
   private initChart(): void {
     if (!this.chartContainer) return;
 
-    this.chart = echarts.init(this.chartContainer.nativeElement);
+    this.chart = echarts.init(this.chartContainer.nativeElement, undefined, {
+      renderer: 'canvas',
+      width: 'auto',
+      height: 'auto',
+    });
     this.updateChart(this.eventsState.events());
 
     // Handle window resize
@@ -91,6 +96,11 @@ export class EventTimelineComponent implements OnInit, OnDestroy, AfterViewInit 
 
   private updateChart(events: WorkflowEvent[]): void {
     if (!this.chart) return;
+
+    // Responsive sizing based on container width
+    const containerWidth: number = this.chartContainer.nativeElement.offsetWidth;
+    const isMobile: boolean = containerWidth < 768;
+    const isTablet: boolean = containerWidth >= 768 && containerWidth < 1024;
 
     const xAxisData: string[] = events.map((event: WorkflowEvent) =>
       new Date(event.timestamp).toLocaleTimeString(),
@@ -143,19 +153,19 @@ export class EventTimelineComponent implements OnInit, OnDestroy, AfterViewInit 
         },
       },
       grid: {
-        left: '5%',
-        right: '5%',
-        top: '10%',
-        bottom: '15%',
+        left: isMobile ? '8%' : '5%',
+        right: isMobile ? '8%' : '5%',
+        top: isMobile ? '8%' : '10%',
+        bottom: isMobile ? '18%' : '15%',
         containLabel: true,
       },
       xAxis: {
         type: 'category',
         data: xAxisData,
         axisLabel: {
-          color: this.getCSSVariable('--text-tertiary'),
-          rotate: 45,
-          fontSize: 11,
+          color: this.getCSSVariable('--text-secondary'),
+          rotate: isMobile ? 60 : 45,
+          fontSize: isMobile ? 9 : isTablet ? 10 : 11,
         },
         axisLine: {
           lineStyle: {
