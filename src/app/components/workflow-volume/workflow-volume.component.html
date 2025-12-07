@@ -1,0 +1,19 @@
+<div class="volume-container">
+  <div class="volume-header">
+    <h3 class="volume-title">📊 Workflow Volume</h3>
+    <div class="time-range-filters">
+      @for (option of timeRangeOptions; track option.value) {
+        <button
+          class="filter-btn"
+          [class.active]="selectedTimeRange === option.value"
+          (click)="onTimeRangeChange(option.value)"
+          type="button"
+        >
+          {{ option.label }}
+        </button>
+      }
+    </div>
+  </div>
+
+  <div #volumeChartContainer class="chart-container"></div>
+</div>

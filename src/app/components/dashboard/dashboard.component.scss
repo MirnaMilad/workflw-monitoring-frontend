@@ -26,6 +26,7 @@ app-workflow-metrics {
   overflow: hidden;
 }
 
+app-workflow-volume,
 app-anomaly-heatmap,
 app-event-timeline {
   min-height: 500px;
@@ -45,6 +46,7 @@ app-event-timeline {
     gap: 1.5rem;
   }
 
+  app-workflow-volume,
   app-anomaly-heatmap,
   app-event-timeline {
     min-height: 450px;
@@ -61,6 +63,7 @@ app-event-timeline {
     gap: 1rem;
   }
 
+  app-workflow-volume,
   app-anomaly-heatmap,
   app-event-timeline {
     min-height: 400px;
@@ -77,6 +80,7 @@ app-event-timeline {
     gap: 0.75rem;
   }
 
+  app-workflow-volume,
   app-anomaly-heatmap,
   app-event-timeline {
     min-height: 350px;
