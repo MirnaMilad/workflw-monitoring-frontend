@@ -1,0 +1,20 @@
+<div class="metrics-container">
+  <h2 class="metrics-title">Workflow Health Status</h2>
+  <div class="metrics-grid">
+    @for (metric of metrics(); track metric.title) {
+      <div class="metric-card" [attr.data-status]="metric.status">
+        <div class="metric-icon">{{ metric.icon }}</div>
+        <div class="metric-content">
+          <h3 class="metric-title">{{ metric.title }}</h3>
+          <div class="metric-value">{{ metric.value }}</div>
+          @if (metric.trend) {
+            <div class="metric-trend" [attr.data-positive]="metric.trend.isPositive">
+              <span class="trend-icon">{{ metric.trend.direction === 'up' ? '↑' : '↓' }}</span>
+              <span class="trend-value">{{ metric.trend.value }}%</span>
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</div>
