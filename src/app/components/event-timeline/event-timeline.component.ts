@@ -14,6 +14,7 @@ import * as echarts from 'echarts';
 import type { EChartsOption } from 'echarts';
 import { EventsService } from '../../application/services/events.service';
 import { EventsStateService } from '../../infrastructure/services/events-state.service';
+import { ThemeService } from '../../application/services/theme.service';
 import { WorkflowEvent, mapEventTypeToStatus, EventStatus } from '../../domain/models/event.model';
 import { SeriesDataItem } from './models/series-data-item.model';
 import { getStatusColor, getSeverityColor } from './utils/chart.utils';
@@ -32,6 +33,7 @@ export class EventTimelineComponent implements OnInit, OnDestroy, AfterViewInit 
   private chart: echarts.ECharts | null = null;
   private readonly eventsService: EventsService = inject(EventsService);
   private readonly eventsState: EventsStateService = inject(EventsStateService);
+  private readonly themeService: ThemeService = inject(ThemeService);
 
   constructor() {
     // Effect to update chart when events change
@@ -41,6 +43,18 @@ export class EventTimelineComponent implements OnInit, OnDestroy, AfterViewInit 
         this.updateChart(currentEvents);
       }
     });
+
+    // Effect to update chart when theme changes
+    effect(() => {
+      this.themeService.isDarkMode(); // Track theme changes
+      if (this.chart) {
+        this.updateChart(this.eventsState.events());
+      }
+    });
+  }
+
+  private getCSSVariable(variable: string): string {
+    return getComputedStyle(document.documentElement).getPropertyValue(variable).trim();
   }
 
   ngOnInit(): void {
@@ -100,13 +114,13 @@ export class EventTimelineComponent implements OnInit, OnDestroy, AfterViewInit 
     );
 
     const option: EChartsOption = {
-      backgroundColor: '#1e293b',
+      backgroundColor: this.getCSSVariable('--bg-card'),
       tooltip: {
         trigger: 'item',
         formatter: (params: unknown) => {
           if (Array.isArray(params)) return '';
           if (!params || typeof params !== 'object' || !('data' in params)) return '';
-          const data: SeriesDataItem = (params as any).data as SeriesDataItem;
+          const data: SeriesDataItem = (params as { data: SeriesDataItem }).data;
           const date: Date = new Date(data.timestamp);
           const timeStr: string = date.toLocaleString();
           const workflowInfo: string = data.workflowId ? `Workflow: ${data.workflowId}<br/>` : '';
@@ -121,11 +135,11 @@ export class EventTimelineComponent implements OnInit, OnDestroy, AfterViewInit 
             </div>
           `;
         },
-        backgroundColor: 'rgba(15, 23, 42, 0.95)',
-        borderColor: '#334155',
+        backgroundColor: this.getCSSVariable('--bg-card'),
+        borderColor: this.getCSSVariable('--border-primary'),
         borderWidth: 1,
         textStyle: {
-          color: '#e2e8f0',
+          color: this.getCSSVariable('--text-primary'),
         },
       },
       grid: {
@@ -139,19 +153,19 @@ export class EventTimelineComponent implements OnInit, OnDestroy, AfterViewInit 
         type: 'category',
         data: xAxisData,
         axisLabel: {
-          color: '#94a3b8',
+          color: this.getCSSVariable('--text-tertiary'),
           rotate: 45,
           fontSize: 11,
         },
         axisLine: {
           lineStyle: {
-            color: '#334155',
+            color: this.getCSSVariable('--border-primary'),
           },
         },
         splitLine: {
           show: true,
           lineStyle: {
-            color: '#1e293b',
+            color: this.getCSSVariable('--chart-grid'),
           },
         },
       },
@@ -166,7 +180,7 @@ export class EventTimelineComponent implements OnInit, OnDestroy, AfterViewInit 
           symbolSize: 20,
           itemStyle: {
             borderWidth: 2,
-            borderColor: '#1e293b',
+            borderColor: this.getCSSVariable('--bg-card'),
           },
           emphasis: {
             scale: 1.5,
@@ -180,7 +194,7 @@ export class EventTimelineComponent implements OnInit, OnDestroy, AfterViewInit 
           type: 'line',
           data: seriesData.map((d: SeriesDataItem) => d.value),
           lineStyle: {
-            color: '#475569',
+            color: this.getCSSVariable('--chart-grid'),
             width: 2,
             type: 'dashed',
           },

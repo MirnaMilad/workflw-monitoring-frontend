@@ -1,0 +1,21 @@
+<button
+  class="theme-toggle"
+  (click)="toggleTheme()"
+  (keydown.enter)="toggleTheme()"
+  (keydown.space)="toggleTheme()"
+  [attr.aria-label]="isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'"
+  type="button"
+>
+  <div class="toggle-container">
+    <div class="toggle-track" [class.dark]="isDarkMode">
+      <div class="toggle-thumb" [class.dark]="isDarkMode">
+        @if (!isDarkMode) {
+          <span [innerHTML]="sunIcon"></span>
+        }
+        @if (isDarkMode) {
+          <span [innerHTML]="moonIcon"></span>
+        }
+      </div>
+    </div>
+  </div>
+</button>

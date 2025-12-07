@@ -1,0 +1,99 @@
+/* Theme Color Variables */
+
+/* Light Theme */
+:root[data-theme='light'] {
+  /* Background Colors */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8fafc;
+  --bg-tertiary: #f1f5f9;
+  --bg-card: #ffffff;
+  --bg-hover: #f1f5f9;
+
+  /* Text Colors */
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-tertiary: #64748b;
+  --text-muted: #94a3b8;
+
+  /* Border Colors */
+  --border-primary: #e2e8f0;
+  --border-secondary: #cbd5e1;
+  --border-focus: #3b82f6;
+
+  /* Status Colors */
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+  --color-info: #3b82f6;
+
+  /* Chart Colors */
+  --chart-primary: #3b82f6;
+  --chart-secondary: #8b5cf6;
+  --chart-tertiary: #ec4899;
+  --chart-grid: #e2e8f0;
+  --chart-text: #64748b;
+
+  /* Toggle Colors */
+  --toggle-bg-light: #e2e8f0;
+  --toggle-bg-dark: #475569;
+  --toggle-border-light: #cbd5e1;
+  --toggle-border-dark: #64748b;
+  --toggle-thumb-light: #ffffff;
+  --toggle-thumb-dark: #1e293b;
+  --toggle-icon-light: #f59e0b;
+  --toggle-icon-dark: #fbbf24;
+
+  /* Shadow */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+/* Dark Theme */
+:root[data-theme='dark'] {
+  /* Background Colors */
+  --bg-primary: #0f172a;
+  --bg-secondary: #1e293b;
+  --bg-tertiary: #334155;
+  --bg-card: #1e293b;
+  --bg-hover: #334155;
+
+  /* Text Colors */
+  --text-primary: #f1f5f9;
+  --text-secondary: #cbd5e1;
+  --text-tertiary: #94a3b8;
+  --text-muted: #64748b;
+
+  /* Border Colors */
+  --border-primary: #334155;
+  --border-secondary: #475569;
+  --border-focus: #60a5fa;
+
+  /* Status Colors */
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+  --color-info: #3b82f6;
+
+  /* Chart Colors */
+  --chart-primary: #60a5fa;
+  --chart-secondary: #a78bfa;
+  --chart-tertiary: #f472b6;
+  --chart-grid: #334155;
+  --chart-text: #94a3b8;
+
+  /* Toggle Colors */
+  --toggle-bg-light: #e2e8f0;
+  --toggle-bg-dark: #475569;
+  --toggle-border-light: #cbd5e1;
+  --toggle-border-dark: #64748b;
+  --toggle-thumb-light: #ffffff;
+  --toggle-thumb-dark: #1e293b;
+  --toggle-icon-light: #f59e0b;
+  --toggle-icon-dark: #fbbf24;
+
+  /* Shadow */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+}
