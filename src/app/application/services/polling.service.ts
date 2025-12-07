@@ -20,9 +20,12 @@ export class PollingService {
     data: Signal<T | null>;
     start: () => void;
     stop: () => void;
+    updateInterval: (newIntervalMs: number) => void;
+    refresh: () => void;
   } {
     const dataSignal: WritableSignal<T | null> = signal<T | null>(null);
     let pollingInterval: ReturnType<typeof setInterval> | null = null;
+    let currentInterval: number = intervalMs;
 
     const fetchData: () => void = (): void => {
       this.apiService.get<T>(endpoint).subscribe({
@@ -43,7 +46,7 @@ export class PollingService {
       if (!pollingInterval) {
         pollingInterval = setInterval(() => {
           fetchData();
-        }, intervalMs);
+        }, currentInterval);
       }
     };
 
@@ -54,10 +57,25 @@ export class PollingService {
       }
     };
 
+    const updateInterval: (newIntervalMs: number) => void = (newIntervalMs: number): void => {
+      currentInterval = newIntervalMs;
+      const wasRunning: boolean = pollingInterval !== null;
+      if (wasRunning) {
+        stop();
+        start();
+      }
+    };
+
+    const refresh: () => void = (): void => {
+      fetchData();
+    };
+
     return {
       data: dataSignal.asReadonly(),
       start,
       stop,
+      updateInterval,
+      refresh,
     };
   }
 }

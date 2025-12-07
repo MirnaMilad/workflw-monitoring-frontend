@@ -1,0 +1,153 @@
+.refresh-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.icon-btn,
+.toggle-btn,
+.interval-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border: 1px solid var(--border-primary);
+  border-radius: 8px;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: var(--bg-hover);
+    border-color: var(--border-hover);
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--accent-color-alpha);
+  }
+}
+
+.refresh-btn {
+  svg {
+    transition: transform 0.3s ease;
+  }
+
+  &:active svg {
+    transform: rotate(180deg);
+  }
+}
+
+.toggle-btn {
+  gap: 8px;
+  padding: 8px 12px;
+
+  &.active {
+    background: var(--accent-color);
+    color: var(--bg-primary);
+    border-color: var(--accent-color);
+
+    .toggle-indicator {
+      background: var(--bg-primary);
+    }
+  }
+
+  .toggle-label {
+    font-weight: 500;
+  }
+
+  .toggle-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--color-success);
+    transition: background 0.2s ease;
+  }
+}
+
+.interval-selector {
+  position: relative;
+}
+
+.interval-btn {
+  gap: 6px;
+  padding: 8px 12px;
+  min-width: 70px;
+
+  svg {
+    transition: transform 0.2s ease;
+  }
+
+  &:hover svg {
+    transform: translateY(2px);
+  }
+}
+
+.interval-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 120px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-primary);
+  border-radius: 8px;
+  box-shadow: var(--shadow-lg);
+  padding: 4px;
+  z-index: 100;
+}
+
+.interval-option {
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: var(--bg-hover);
+  }
+
+  &.active {
+    background: var(--accent-color);
+    color: var(--bg-primary);
+    font-weight: 500;
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--accent-color-alpha);
+  }
+}
+
+@media (max-width: 768px) {
+  .refresh-control {
+    gap: 6px;
+  }
+
+  .icon-btn,
+  .toggle-btn,
+  .interval-btn {
+    padding: 6px;
+    font-size: 12px;
+  }
+
+  .toggle-btn {
+    padding: 6px 10px;
+
+    .toggle-label {
+      display: none;
+    }
+  }
+
+  .interval-btn {
+    min-width: 60px;
+    padding: 6px 10px;
+  }
+}

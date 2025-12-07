@@ -13,6 +13,8 @@ export class WorkflowMetricsService {
     data: Signal<WorkflowOverview | null>;
     start: () => void;
     stop: () => void;
+    updateInterval: (newIntervalMs: number) => void;
+    refresh: () => void;
   };
 
   readonly overview: Signal<WorkflowOverview | null>;
@@ -25,11 +27,18 @@ export class WorkflowMetricsService {
     this.overview = this.poller.data;
   }
 
-  startPolling(): void {
+  startPolling(intervalMs?: number): void {
+    if (intervalMs) {
+      this.poller.updateInterval(intervalMs);
+    }
     this.poller.start();
   }
 
   stopPolling(): void {
     this.poller.stop();
+  }
+
+  refresh(): void {
+    this.poller.refresh();
   }
 }

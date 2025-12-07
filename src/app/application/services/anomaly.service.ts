@@ -13,6 +13,8 @@ export class AnomalyService {
     data: Signal<AnomaliesResponse | null>;
     start: () => void;
     stop: () => void;
+    updateInterval: (newIntervalMs: number) => void;
+    refresh: () => void;
   };
 
   constructor(private readonly pollingService: PollingService) {
@@ -27,11 +29,18 @@ export class AnomalyService {
     return response?.anomalies || [];
   }
 
-  startPolling(): void {
+  startPolling(intervalMs?: number): void {
+    if (intervalMs) {
+      this.poller.updateInterval(intervalMs);
+    }
     this.poller.start();
   }
 
   stopPolling(): void {
     this.poller.stop();
+  }
+
+  refresh(): void {
+    this.poller.refresh();
   }
 }

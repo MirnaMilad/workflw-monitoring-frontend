@@ -27,6 +27,8 @@ export class WorkflowVolumeService {
     data: Signal<TimelineResponse | null>;
     start: () => void;
     stop: () => void;
+    updateInterval: (newIntervalMs: number) => void;
+    refresh: () => void;
   } | null = null;
 
   constructor(private readonly pollingService: PollingService) {
@@ -69,11 +71,18 @@ export class WorkflowVolumeService {
     this.startPolling();
   }
 
-  startPolling(): void {
+  startPolling(intervalMs?: number): void {
+    if (intervalMs) {
+      this.poller?.updateInterval(intervalMs);
+    }
     this.poller?.start();
   }
 
   stopPolling(): void {
     this.poller?.stop();
+  }
+
+  refresh(): void {
+    this.poller?.refresh();
   }
 }

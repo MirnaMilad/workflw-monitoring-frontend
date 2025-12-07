@@ -1,0 +1,39 @@
+<div class="refresh-control">
+  <button
+    class="refresh-btn icon-btn"
+    (click)="onManualRefresh()"
+    title="Refresh Now"
+    [innerHTML]="refreshIcon | safeHtml"
+  ></button>
+
+  <button
+    class="toggle-btn"
+    [class.active]="config().autoRefresh"
+    (click)="toggleAutoRefresh()"
+    title="Toggle Auto-Refresh"
+  >
+    <span class="toggle-label">Auto</span>
+    <span class="toggle-indicator"></span>
+  </button>
+
+  <div class="interval-selector">
+    <button class="interval-btn" (click)="toggleIntervalMenu()">
+      {{ config().interval }}s
+      <span [innerHTML]="chevronDownIcon | safeHtml"></span>
+    </button>
+
+    @if (showIntervalMenu()) {
+      <div class="interval-menu">
+        @for (interval of intervals; track interval.value) {
+          <button
+            class="interval-option"
+            [class.active]="config().interval === interval.value"
+            (click)="setInterval(interval.value)"
+          >
+            {{ interval.label }}
+          </button>
+        }
+      </div>
+    }
+  </div>
+</div>
