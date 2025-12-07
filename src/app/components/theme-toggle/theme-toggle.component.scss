@@ -48,8 +48,16 @@
     justify-content: center;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 
+    span {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 0;
+    }
+
     svg {
       color: var(--toggle-icon-light);
+      stroke: var(--toggle-icon-light);
     }
 
     &.dark {
@@ -58,6 +66,7 @@
 
       svg {
         color: var(--toggle-icon-dark);
+        stroke: var(--toggle-icon-dark);
       }
     }
   }
