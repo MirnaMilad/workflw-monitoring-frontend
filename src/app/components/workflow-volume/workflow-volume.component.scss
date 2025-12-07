@@ -52,8 +52,8 @@
   }
 
   &.active {
-    background: var(--color-primary);
-    color: white;
+    background: var(--accent-color);
+    color: var(--bg-primary);
   }
 
   &:focus {

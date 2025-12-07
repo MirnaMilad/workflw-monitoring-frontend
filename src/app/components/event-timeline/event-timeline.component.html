@@ -16,5 +16,18 @@
       </span>
     </div>
   </div>
+
+  <div class="filter-controls">
+    @for (filter of categoryFilters(); track filter.value) {
+      <button
+        class="filter-button"
+        [class.active]="filter.active"
+        (click)="onFilterChange(filter.value)"
+      >
+        {{ filter.label }}
+      </button>
+    }
+  </div>
+
   <div #chartContainer class="chart-container"></div>
 </div>

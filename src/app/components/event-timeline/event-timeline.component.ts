@@ -8,6 +8,8 @@ import {
   ChangeDetectionStrategy,
   effect,
   inject,
+  signal,
+  WritableSignal,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import * as echarts from 'echarts';
@@ -15,9 +17,22 @@ import type { EChartsOption } from 'echarts';
 import { EventsService } from '../../application/services/events.service';
 import { EventsStateService } from '../../infrastructure/services/events-state.service';
 import { ThemeService } from '../../application/services/theme.service';
-import { WorkflowEvent, mapEventTypeToStatus, EventStatus } from '../../domain/models/event.model';
+import { WorkflowEvent, EventStatus } from '../../domain/models/event.model';
 import { SeriesDataItem } from './models/series-data-item.model';
-import { getStatusColor, getSeverityColor } from './utils/chart.utils';
+import { CategoryFilter, CATEGORY_FILTERS } from './models/category-filter.model';
+import {
+  RESPONSIVE_CONFIG,
+  AUTO_SCROLL_THRESHOLD,
+  buildChartOption,
+} from './event-timeline.config';
+import {
+  getCSSVariable,
+  getDeviceType,
+  transformEventsToChartData,
+  formatTooltip,
+  calculateAutoScrollPosition,
+  filterEventsByCategory,
+} from './utils/timeline.utils';
 
 @Component({
   selector: 'app-event-timeline',
@@ -35,12 +50,17 @@ export class EventTimelineComponent implements OnInit, OnDestroy, AfterViewInit 
   private readonly eventsState: EventsStateService = inject(EventsStateService);
   private readonly themeService: ThemeService = inject(ThemeService);
 
+  readonly categoryFilters: WritableSignal<CategoryFilter[]> = signal(CATEGORY_FILTERS);
+  readonly activeFilter: WritableSignal<EventStatus | 'all'> = signal('all');
+
   constructor() {
-    // Effect to update chart when events change
+    // Effect to update chart when events or filter change
     effect(() => {
       const currentEvents: WorkflowEvent[] = this.eventsState.events();
+      const filter: EventStatus | 'all' = this.activeFilter();
+      const filteredEvents: WorkflowEvent[] = filterEventsByCategory(currentEvents, filter);
       if (this.chart) {
-        this.updateChart(currentEvents);
+        this.updateChart(filteredEvents);
       }
     });
 
@@ -51,10 +71,6 @@ export class EventTimelineComponent implements OnInit, OnDestroy, AfterViewInit 
         this.updateChart(this.eventsState.events());
       }
     });
-  }
-
-  private getCSSVariable(variable: string): string {
-    return getComputedStyle(document.documentElement).getPropertyValue(variable).trim();
   }
 
   ngOnInit(): void {
@@ -99,130 +115,49 @@ export class EventTimelineComponent implements OnInit, OnDestroy, AfterViewInit 
 
     // Responsive sizing based on container width
     const containerWidth: number = this.chartContainer.nativeElement.offsetWidth;
-    const isMobile: boolean = containerWidth < 768;
-    const isTablet: boolean = containerWidth >= 768 && containerWidth < 1024;
+    const { isMobile, isTablet }: { isMobile: boolean; isTablet: boolean; isDesktop: boolean } =
+      getDeviceType(containerWidth);
 
-    const xAxisData: string[] = events.map((event: WorkflowEvent) =>
-      new Date(event.timestamp).toLocaleTimeString(),
-    );
-    const seriesData: SeriesDataItem[] = events.map(
-      (event: WorkflowEvent, index: number): SeriesDataItem => {
-        const status: EventStatus = mapEventTypeToStatus(event.type);
-        return {
-          value: index,
-          itemStyle: {
-            color: getStatusColor(status),
-          },
-          name: event.message,
-          status,
-          timestamp: event.timestamp,
-          severity: event.severity,
-          workflowId: event.workflowId,
-          type: event.type,
-        };
-      },
-    );
+    // Transform events to chart data
+    const { xAxisData, seriesData }: { xAxisData: string[]; seriesData: SeriesDataItem[] } =
+      transformEventsToChartData(events);
 
-    const option: EChartsOption = {
-      backgroundColor: this.getCSSVariable('--bg-card'),
-      tooltip: {
-        trigger: 'item',
-        formatter: (params: unknown) => {
-          if (Array.isArray(params)) return '';
-          if (!params || typeof params !== 'object' || !('data' in params)) return '';
-          const data: SeriesDataItem = (params as { data: SeriesDataItem }).data;
-          const date: Date = new Date(data.timestamp);
-          const timeStr: string = date.toLocaleString();
-          const workflowInfo: string = data.workflowId ? `Workflow: ${data.workflowId}<br/>` : '';
+    // Get responsive configuration
+    const responsiveConfig: (typeof RESPONSIVE_CONFIG)['mobile'] =
+      RESPONSIVE_CONFIG[isMobile ? 'mobile' : isTablet ? 'tablet' : 'desktop'];
 
-          return `
-            <div style="padding: 8px;">
-              <strong>${data.name}</strong><br/>
-              <span style="color: ${getStatusColor(data.status)}">● ${data.status.toUpperCase()}</span><br/>
-              ${workflowInfo}Type: ${data.type}<br/>
-              Severity: <span style="color: ${getSeverityColor(data.severity)}">${data.severity.toUpperCase()}</span><br/>
-              Time: ${timeStr}
-            </div>
-          `;
-        },
-        backgroundColor: this.getCSSVariable('--bg-card'),
-        borderColor: this.getCSSVariable('--border-primary'),
-        borderWidth: 1,
-        textStyle: {
-          color: this.getCSSVariable('--text-primary'),
-        },
-      },
-      grid: {
-        left: isMobile ? '8%' : '5%',
-        right: isMobile ? '8%' : '5%',
-        top: isMobile ? '8%' : '10%',
-        bottom: isMobile ? '18%' : '15%',
-        containLabel: true,
-      },
-      xAxis: {
-        type: 'category',
-        data: xAxisData,
-        axisLabel: {
-          color: this.getCSSVariable('--text-secondary'),
-          rotate: isMobile ? 60 : 45,
-          fontSize: isMobile ? 9 : isTablet ? 10 : 11,
-        },
-        axisLine: {
-          lineStyle: {
-            color: this.getCSSVariable('--border-primary'),
-          },
-        },
-        splitLine: {
-          show: true,
-          lineStyle: {
-            color: this.getCSSVariable('--chart-grid'),
-          },
-        },
-      },
-      yAxis: {
-        type: 'value',
-        show: false,
-      },
-      series: [
-        {
-          type: 'scatter',
-          data: seriesData,
-          symbolSize: 20,
-          itemStyle: {
-            borderWidth: 2,
-            borderColor: this.getCSSVariable('--bg-card'),
-          },
-          emphasis: {
-            scale: 1.5,
-            itemStyle: {
-              shadowBlur: 10,
-              shadowColor: 'rgba(0, 0, 0, 0.5)',
-            },
-          },
-        },
-        {
-          type: 'line',
-          data: seriesData.map((d: SeriesDataItem) => d.value),
-          lineStyle: {
-            color: this.getCSSVariable('--chart-grid'),
-            width: 2,
-            type: 'dashed',
-          },
-          symbol: 'none',
-          smooth: true,
-        },
-      ],
-    };
+    // Build chart option using config function
+    const option: EChartsOption = buildChartOption(
+      xAxisData,
+      seriesData,
+      responsiveConfig,
+      getCSSVariable,
+      formatTooltip as (data: unknown) => string,
+    ) as EChartsOption;
 
     this.chart.setOption(option, true);
 
     // Auto-scroll to the latest event
-    if (events.length > 10) {
+    if (events.length > AUTO_SCROLL_THRESHOLD) {
+      const scrollPosition: { start: number; end: number } = calculateAutoScrollPosition(
+        events.length,
+        AUTO_SCROLL_THRESHOLD,
+      );
       this.chart.dispatchAction({
         type: 'dataZoom',
-        start: Math.max(0, ((events.length - 10) / events.length) * 100),
-        end: 100,
+        ...scrollPosition,
       });
     }
+  }
+
+  onFilterChange(filterValue: EventStatus | 'all'): void {
+    this.activeFilter.set(filterValue);
+    const updatedFilters: CategoryFilter[] = this.categoryFilters().map(
+      (filter: CategoryFilter) => ({
+        ...filter,
+        active: filter.value === filterValue,
+      }),
+    );
+    this.categoryFilters.set(updatedFilters);
   }
 }
