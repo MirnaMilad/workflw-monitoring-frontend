@@ -1,0 +1,34 @@
+<button
+  class="pause-toggle-btn"
+  [class.paused]="isPaused()"
+  (click)="toggle()"
+  [attr.aria-label]="isPaused() ? 'Resume updates' : 'Pause updates'"
+  [title]="isPaused() ? 'Resume updates' : 'Pause updates'"
+>
+  <div class="icon-container">
+    @if (isPaused()) {
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="currentColor"
+        class="play-icon"
+      >
+        <path d="M8 5v14l11-7z" />
+      </svg>
+    } @else {
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="currentColor"
+        class="pause-icon"
+      >
+        <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
+      </svg>
+    }
+  </div>
+  <span class="label">{{ isPaused() ? 'Resume' : 'Pause' }}</span>
+</button>
